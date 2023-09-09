@@ -1,15 +1,21 @@
 import { Avatar, Box } from "@mui/material";
 import { Search } from "@mui/icons-material";
-
-const fonts = {
-  font_12: "0.625vw",
-  font_14: "0.729vw",
-  font_16: "0.833vw",
-  font_18: "0.938vw",
-  font_20: "1.042vw",
-};
+import { useEffect } from "react";
+import axios from "axios";
+import { fonts } from "../common/utils";
 
 const ChatList = () => {
+  useEffect(() => {
+    getChatList();
+  }, []);
+
+  const getChatList = () => {
+    axios
+      .get("http://localhost:8080/find/chat?userId=64fbfdbea7362fe4d50c954c")
+      .then((res) => console.log(res))
+      .catch((error) => console.log(error));
+  };
+
   return (
     <Box
       style={{
