@@ -1,6 +1,6 @@
 import { Avatar, Box, IconButton, TextField } from "@mui/material";
 import { Add, ArrowBack, Search } from "@mui/icons-material";
-import { fonts } from "../common/utils";
+import { fonts, getTimestamp } from "../common/utils";
 import { useCallback, useEffect, useState } from "react";
 import { useDebounce } from "../common/useDebounce";
 import axios from "axios";
@@ -238,78 +238,87 @@ const ChatList = ({ list, selectChat, selectedChat }) => {
               "scrollbar-width": "none",
             }}
           >
-            {list.map((chat) => (
-              <Box
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "0.7vw",
-                  backgroundColor:
-                    chat._id === selectedChat._id ? "#3b3e46ff" : "#23262fff",
-                  borderRadius: "0.4vw",
-                  cursor: "pointer",
-                }}
-                onClick={() => selectChat(chat)}
-              >
-                <Box style={{ alignSelf: "center" }}>
-                  <Avatar sx={{ width: "2vw", height: "2vw" }}>
-                    {chat.name === ""
-                      ? chat.participants
-                          .filter(
-                            (part) =>
-                              part._id !==
-                              sessionStorage.getItem("chattyUserId")
-                          )[0]
-                          .name.charAt(0)
-                          .toUpperCase()
-                      : chat.name.charAt(0).toUpperCase()}
-                  </Avatar>
-                </Box>
-                <Box
-                  style={{
-                    display: "flex",
-                    width: "65%",
-                    flexDirection: "column",
-                  }}
-                >
+            {list.map(
+              (chat) =>
+                chat.pings.length > 0 && (
                   <Box
                     style={{
-                      color: "#fff",
-                      fontSize: fonts.font_18,
-                      padding: "0.2vw 0",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "0.7vw",
+                      backgroundColor:
+                        chat._id === selectedChat._id
+                          ? "#3b3e46ff"
+                          : "#23262fff",
+                      borderRadius: "0.4vw",
+                      cursor: "pointer",
                     }}
+                    onClick={() => selectChat(chat)}
                   >
-                    {chat.name === ""
-                      ? chat.participants.filter(
-                          (part) =>
-                            part._id !== sessionStorage.getItem("chattyUserId")
-                        )[0].name
-                      : chat.name}
-                  </Box>
-                  <Box
-                    style={{
-                      color: "#777889ff",
-                      fontSize: fonts.font_18,
-                      padding: "0.2vw 0 0vw",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    this is a really long msg
-                  </Box>
-                </Box>
-                <Box
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Box style={{ color: "#fff", fontSize: fonts.font_12 }}>
-                    time
-                  </Box>
-                  <Avatar
+                    <Box style={{ alignSelf: "center" }}>
+                      <Avatar sx={{ width: "2vw", height: "2vw" }}>
+                        {chat.name === ""
+                          ? chat.participants
+                              .filter(
+                                (part) =>
+                                  part._id !==
+                                  sessionStorage.getItem("chattyUserId")
+                              )[0]
+                              .name.charAt(0)
+                              .toUpperCase()
+                          : chat.name.charAt(0).toUpperCase()}
+                      </Avatar>
+                    </Box>
+                    <Box
+                      style={{
+                        display: "flex",
+                        width: "65%",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <Box
+                        style={{
+                          color: "#fff",
+                          fontSize: fonts.font_18,
+                          padding: "0.2vw 0",
+                        }}
+                      >
+                        {chat.name === ""
+                          ? chat.participants.filter(
+                              (part) =>
+                                part._id !==
+                                sessionStorage.getItem("chattyUserId")
+                            )[0].name
+                          : chat.name}
+                      </Box>
+                      <Box
+                        style={{
+                          color: "#777889ff",
+                          fontSize: fonts.font_18,
+                          padding: "0.2vw 0 0vw",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {chat.pings.length > 0 &&
+                          chat.pings[chat.pings.length - 1].message}
+                      </Box>
+                    </Box>
+                    <Box
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Box style={{ color: "#fff", fontSize: fonts.font_14 }}>
+                        {chat.pings.length > 0 &&
+                          getTimestamp(
+                            chat.pings[chat.pings.length - 1].createdAt
+                          )}
+                      </Box>
+                      {/* <Avatar
                     sx={{
                       width: "0.9vw",
                       height: "0.9vw",
@@ -319,10 +328,11 @@ const ChatList = ({ list, selectChat, selectedChat }) => {
                     }}
                   >
                     1
-                  </Avatar>
-                </Box>
-              </Box>
-            ))}
+                  </Avatar> */}
+                    </Box>
+                  </Box>
+                )
+            )}
             <IconButton
               sx={{
                 backgroundColor: "#2f80edff",

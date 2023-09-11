@@ -23,6 +23,16 @@ const Home = () => {
     getChatList();
   };
 
+  const sortChats = (chats) => {
+    let sortedChats = chats.sort(function (a, b) {
+      return (
+        new Date(b.latestPing.createdAt) - new Date(a.latestPing.createdAt)
+      );
+    });
+    setChatList(sortedChats);
+    setSelectedChat(sortedChats[0] ? sortedChats[0] : []);
+  };
+
   const getChatList = () => {
     axios
       .get(
@@ -31,8 +41,7 @@ const Home = () => {
         )}`
       )
       .then((res) => {
-        setChatList(res.data);
-        setSelectedChat(res.data[0]);
+        sortChats(res.data);
       })
       .catch((error) => console.log(error));
   };
