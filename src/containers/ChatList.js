@@ -46,6 +46,17 @@ const ChatList = ({ list, selectChat, selectedChat }) => {
       .catch((error) => console.log(error));
   };
 
+  const getUnreadCount = (chat) => {
+    let totalCount = chat.pings.length;
+    let userReadCount = chat.read.find(
+      (user) => user.participantId === sessionStorage.getItem("chattyUserId")
+    )?.readNotificationCount;
+    if (!userReadCount) {
+      return totalCount;
+    }
+    return totalCount - userReadCount;
+  };
+
   useEffect(() => {
     search();
   }, [debouncedValue, search]);
@@ -272,7 +283,7 @@ const ChatList = ({ list, selectChat, selectedChat }) => {
                     <Box
                       style={{
                         display: "flex",
-                        width: "65%",
+                        width: "60%",
                         flexDirection: "column",
                       }}
                     >
@@ -318,17 +329,19 @@ const ChatList = ({ list, selectChat, selectedChat }) => {
                             chat.pings[chat.pings.length - 1].createdAt
                           )}
                       </Box>
-                      {/* <Avatar
-                    sx={{
-                      width: "0.9vw",
-                      height: "0.9vw",
-                      fontSize: fonts.font_12,
-                      bgcolor: "#2f80edff",
-                      alignSelf: "flex-end",
-                    }}
-                  >
-                    1
-                  </Avatar> */}
+                      {getUnreadCount(chat) > 0 && (
+                        <Avatar
+                          sx={{
+                            width: "0.9vw",
+                            height: "0.9vw",
+                            fontSize: fonts.font_12,
+                            bgcolor: "#2f80edff",
+                            alignSelf: "flex-end",
+                          }}
+                        >
+                          {getUnreadCount(chat)}
+                        </Avatar>
+                      )}
                     </Box>
                   </Box>
                 )

@@ -120,7 +120,7 @@ const Chat = ({ chat, refresh }) => {
                 <Message
                   content={ping.message}
                   type={
-                    ping.author._id === sessionStorage.getItem("chattyUserId")
+                    ping.author === sessionStorage.getItem("chattyUserId")
                       ? "sender"
                       : "receiver"
                   }

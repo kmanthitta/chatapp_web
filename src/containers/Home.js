@@ -30,7 +30,6 @@ const Home = () => {
       );
     });
     setChatList(sortedChats);
-    setSelectedChat(sortedChats[0] ? sortedChats[0] : []);
   };
 
   const getChatList = () => {
@@ -48,6 +47,11 @@ const Home = () => {
 
   const selectChat = (chat) => {
     setSelectedChat(chat);
+    axios.post(
+      `http://localhost:8080/chat/read?userId=${sessionStorage.getItem(
+        "chattyUserId"
+      )}&chatroomId=${chat._id}&count=${chat.pings.length}`
+    );
   };
 
   return (
