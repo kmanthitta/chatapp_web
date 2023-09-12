@@ -2,14 +2,20 @@ import { Box } from "@mui/material";
 import ChatList from "./ChatList";
 import Chat from "./Chat";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setActiveChatName, setChats, setSelectedChat } from "../store/chat";
+import { io } from "socket.io-client";
 
 const Home = () => {
-  const [chatList, setChatList] = useState([]);
-  const [selectedChat, setSelectedChat] = useState({});
+  const selectedChat = useSelector((state) => state.chats.selectedChat);
+
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
+
+  const socket = useRef();
 
   useEffect(() => {
     if (!sessionStorage.getItem("chattyUserId")) {
@@ -17,7 +23,17 @@ const Home = () => {
     } else {
       getChatList();
     }
+    socket.current = io("http://localhost:8080");
   }, []);
+
+  useEffect(() => {
+    socket.current.on("ping", (chat) => {
+      if (chat._id === selectedChat._id) {
+        dispatch(setSelectedChat({ selectedChat: chat }));
+      }
+      refresh();
+    });
+  }, [selectedChat]);
 
   const refresh = () => {
     getChatList();
@@ -29,7 +45,7 @@ const Home = () => {
         new Date(b.latestPing.createdAt) - new Date(a.latestPing.createdAt)
       );
     });
-    setChatList(sortedChats);
+    dispatch(setChats({ chats: sortedChats }));
   };
 
   const getChatList = () => {
@@ -45,8 +61,17 @@ const Home = () => {
       .catch((error) => console.log(error));
   };
 
+  const getActiveChatName = (chat) => {
+    return chat.name === ""
+      ? chat.participants.filter(
+          (part) => part._id !== sessionStorage.getItem("chattyUserId")
+        )[0].name
+      : chat.name;
+  };
+
   const selectChat = (chat) => {
-    setSelectedChat(chat);
+    dispatch(setSelectedChat({ selectedChat: chat }));
+    dispatch(setActiveChatName({ name: getActiveChatName(chat) }));
     axios.post(
       `http://localhost:8080/chat/read?userId=${sessionStorage.getItem(
         "chattyUserId"
@@ -57,14 +82,10 @@ const Home = () => {
   return (
     <Box style={{ display: "flex", height: "100vh", width: "100vw" }}>
       <Box style={{ width: "20%" }}>
-        <ChatList
-          list={chatList}
-          selectChat={selectChat}
-          selectedChat={selectedChat}
-        />
+        <ChatList selectChat={selectChat} refresh={refresh} />
       </Box>
       <Box style={{ width: "80%" }}>
-        <Chat chat={selectedChat} refresh={refresh} />
+        <Chat />
       </Box>
     </Box>
   );

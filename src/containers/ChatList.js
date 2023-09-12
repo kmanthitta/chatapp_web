@@ -5,8 +5,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useDebounce } from "../common/useDebounce";
 import axios from "axios";
 import SeachResult from "../components/SearchResult";
+import { useSelector } from "react-redux";
 
-const ChatList = ({ list, selectChat, selectedChat }) => {
+const ChatList = ({ selectChat, refresh }) => {
+  const chats = useSelector((state) => state.chats.chats);
+  const selectedChat = useSelector((state) => state.chats.selectedChat);
+
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -249,7 +253,7 @@ const ChatList = ({ list, selectChat, selectedChat }) => {
               "scrollbar-width": "none",
             }}
           >
-            {list.map(
+            {chats.map(
               (chat) =>
                 chat.pings.length > 0 && (
                   <Box

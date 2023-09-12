@@ -4,20 +4,23 @@ import Message from "../components/Message";
 import { fonts } from "../common/utils";
 import { useState } from "react";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
-const Chat = ({ chat, refresh }) => {
+const Chat = () => {
+  const selectedChat = useSelector((state) => state.chats.selectedChat);
+  const activeChatName = useSelector((state) => state.chats.activeChatName);
+
   const [message, setMessage] = useState("");
 
   const handleSendMessage = () => {
     axios
       .post("http://localhost:8080/chat/ping", {
-        chatroomId: chat._id,
+        chatroomId: selectedChat._id,
         author: sessionStorage.getItem("chattyUserId"),
         message,
       })
       .then((res) => {
         setMessage("");
-        refresh();
       });
   };
 
@@ -30,7 +33,7 @@ const Chat = ({ chat, refresh }) => {
         boxSizing: "border-box",
       }}
     >
-      {!chat || Object.keys(chat).length === 0 ? (
+      {!selectedChat || Object.keys(selectedChat).length === 0 ? (
         <Box
           style={{
             display: "flex",
@@ -62,15 +65,7 @@ const Chat = ({ chat, refresh }) => {
         >
           <Box style={{ display: "flex", alignItems: "center", height: "5%" }}>
             <Avatar sx={{ width: "2vw", height: "2vw", marginRight: "1vw" }}>
-              {chat.name === ""
-                ? chat.participants
-                    .filter(
-                      (part) =>
-                        part._id !== sessionStorage.getItem("chattyUserId")
-                    )[0]
-                    .name.charAt(0)
-                    .toUpperCase()
-                : chat.name.charAt(0).toUpperCase()}
+              {activeChatName}
             </Avatar>
             <Box>
               <Box
@@ -80,12 +75,7 @@ const Chat = ({ chat, refresh }) => {
                   padding: "0.2vw 0",
                 }}
               >
-                {chat.name === ""
-                  ? chat.participants.filter(
-                      (part) =>
-                        part._id !== sessionStorage.getItem("chattyUserId")
-                    )[0].name
-                  : chat.name}
+                {activeChatName}
               </Box>
               <Box
                 style={{
@@ -116,7 +106,7 @@ const Chat = ({ chat, refresh }) => {
                 "scrollbar-width": "none",
               }}
             >
-              {chat.pings.map((ping) => (
+              {selectedChat.pings.map((ping) => (
                 <Message
                   content={ping.message}
                   type={
