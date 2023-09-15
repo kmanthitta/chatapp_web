@@ -7,8 +7,10 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveChatName, setChats, setSelectedChat } from "../store/chat";
 import { io } from "socket.io-client";
+import { readChat } from "../common/utils";
 
 const Home = () => {
+  const chats = useSelector((state) => state.chats.chats);
   const selectedChat = useSelector((state) => state.chats.selectedChat);
 
   const dispatch = useDispatch();
@@ -31,12 +33,23 @@ const Home = () => {
       if (chat._id === selectedChat._id) {
         dispatch(setSelectedChat({ selectedChat: chat }));
       }
-      refresh();
+      getChatList();
     });
   }, [selectedChat]);
 
-  const refresh = () => {
-    getChatList();
+  const getUnreadCount = (chat) => {
+    let totalCount = chat.pings.length;
+    let userReadCount = chat.read.find(
+      (user) => user.participantId === sessionStorage.getItem("chattyUserId")
+    )?.readNotificationCount;
+    if (chat._id === selectedChat._id) {
+      readChat(chat._id, totalCount);
+      return 0;
+    }
+    if (!userReadCount) {
+      return totalCount;
+    }
+    return totalCount - userReadCount;
   };
 
   const sortChats = (chats) => {
@@ -45,7 +58,12 @@ const Home = () => {
         new Date(b.latestPing.createdAt) - new Date(a.latestPing.createdAt)
       );
     });
-    dispatch(setChats({ chats: sortedChats }));
+
+    let finalChats = sortedChats.map((chat) => {
+      return { ...chat, unreadCount: getUnreadCount(chat) };
+    });
+
+    dispatch(setChats({ chats: finalChats }));
   };
 
   const getChatList = () => {
@@ -70,19 +88,25 @@ const Home = () => {
   };
 
   const selectChat = (chat) => {
-    dispatch(setSelectedChat({ selectedChat: chat }));
     dispatch(setActiveChatName({ name: getActiveChatName(chat) }));
-    axios.post(
-      `http://localhost:8080/chat/read?userId=${sessionStorage.getItem(
-        "chattyUserId"
-      )}&chatroomId=${chat._id}&count=${chat.pings.length}`
-    );
+    readChat(chat._id, chat.pings.length);
+
+    let chatList = chats;
+    let final = chatList.map((item) => {
+      if (chat._id === item._id) {
+        return { ...item, unreadCount: 0 };
+      } else {
+        return item;
+      }
+    });
+    dispatch(setChats({ chats: final }));
+    dispatch(setSelectedChat({ selectedChat: chat }));
   };
 
   return (
     <Box style={{ display: "flex", height: "100vh", width: "100vw" }}>
       <Box style={{ width: "20%" }}>
-        <ChatList selectChat={selectChat} refresh={refresh} />
+        <ChatList selectChat={selectChat} />
       </Box>
       <Box style={{ width: "80%" }}>
         <Chat />

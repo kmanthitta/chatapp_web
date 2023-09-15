@@ -7,7 +7,7 @@ import axios from "axios";
 import SeachResult from "../components/SearchResult";
 import { useSelector } from "react-redux";
 
-const ChatList = ({ selectChat, refresh }) => {
+const ChatList = ({ selectChat }) => {
   const chats = useSelector((state) => state.chats.chats);
   const selectedChat = useSelector((state) => state.chats.selectedChat);
 
@@ -333,7 +333,7 @@ const ChatList = ({ selectChat, refresh }) => {
                             chat.pings[chat.pings.length - 1].createdAt
                           )}
                       </Box>
-                      {getUnreadCount(chat) > 0 && (
+                      {chat.unreadCount > 0 && (
                         <Avatar
                           sx={{
                             width: "0.9vw",
@@ -343,7 +343,7 @@ const ChatList = ({ selectChat, refresh }) => {
                             alignSelf: "flex-end",
                           }}
                         >
-                          {getUnreadCount(chat)}
+                          {chat.unreadCount}
                         </Avatar>
                       )}
                     </Box>

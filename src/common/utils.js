@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const fonts = {
   font_12: "0.625vw",
   font_14: "0.729vw",
@@ -13,4 +15,12 @@ export const getTimestamp = (timestamp) => {
   let time = new Date(timestamp).toISOString().split("T")[1].split(".")[0];
   time = time.slice(0, time.lastIndexOf(":"));
   return time;
+};
+
+export const readChat = (chatId, count) => {
+  axios.post(
+    `http://localhost:8080/chat/read?userId=${sessionStorage.getItem(
+      "chattyUserId"
+    )}&chatroomId=${chatId}&count=${count}`
+  );
 };

@@ -2,7 +2,7 @@ import { Avatar, Box, IconButton, TextField, Typography } from "@mui/material";
 import { Send } from "@mui/icons-material";
 import Message from "../components/Message";
 import { fonts } from "../common/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
@@ -13,16 +13,31 @@ const Chat = () => {
   const [message, setMessage] = useState("");
 
   const handleSendMessage = () => {
-    axios
-      .post("http://localhost:8080/chat/ping", {
-        chatroomId: selectedChat._id,
-        author: sessionStorage.getItem("chattyUserId"),
-        message,
-      })
-      .then((res) => {
-        setMessage("");
-      });
+    if (message.length > 0) {
+      axios
+        .post("http://localhost:8080/chat/ping", {
+          chatroomId: selectedChat._id,
+          author: sessionStorage.getItem("chattyUserId"),
+          message,
+        })
+        .then((res) => {
+          setMessage("");
+        });
+    }
   };
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      let chatWindow = document.getElementById("chatWindow");
+      chatWindow?.scroll({
+        top: chatWindow.scrollHeight,
+      });
+    });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  });
 
   return (
     <Box
@@ -105,6 +120,7 @@ const Chat = () => {
                 "-ms-overflow-style": "none",
                 "scrollbar-width": "none",
               }}
+              id="chatWindow"
             >
               {selectedChat.pings.map((ping) => (
                 <Message
