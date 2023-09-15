@@ -1,10 +1,7 @@
 import { Box } from "@mui/material";
-import { fonts } from "../common/utils";
+import { fonts, getTimestamp } from "../common/utils";
 
 const Message = ({ content, type, timestamp }) => {
-  let time = new Date(timestamp).toISOString().split("T")[1].split(".")[0];
-  time = time.slice(0, time.lastIndexOf(":"));
-
   return (
     <Box
       style={{
@@ -42,7 +39,7 @@ const Message = ({ content, type, timestamp }) => {
             padding: "0.3vw 0.4vw 0 0",
           }}
         >
-          {time}
+          {getTimestamp(timestamp)}
         </Box>
       </Box>
     </Box>

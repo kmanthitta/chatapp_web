@@ -1,4 +1,5 @@
 import axios from "axios";
+import moment from "moment";
 
 export const fonts = {
   font_12: "0.625vw",
@@ -12,9 +13,8 @@ export const fonts = {
 };
 
 export const getTimestamp = (timestamp) => {
-  let time = new Date(timestamp).toISOString().split("T")[1].split(".")[0];
-  time = time.slice(0, time.lastIndexOf(":"));
-  return time;
+  return moment.utc(timestamp).local().format("hh:mm A");
+  // return moment.utc(timestamp).local().format("HH:mm");
 };
 
 export const readChat = (chatId, count) => {

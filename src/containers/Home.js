@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import ChatList from "./ChatList";
 import Chat from "./Chat";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveChatName, setChats, setSelectedChat } from "../store/chat";
@@ -54,9 +54,13 @@ const Home = () => {
 
   const sortChats = (chats) => {
     let sortedChats = chats.sort(function (a, b) {
-      return (
-        new Date(b.latestPing.createdAt) - new Date(a.latestPing.createdAt)
-      );
+      if (a.latestPing && b.latestPing) {
+        return (
+          new Date(b.latestPing.createdAt) - new Date(a.latestPing.createdAt)
+        );
+      } else {
+        return 0;
+      }
     });
 
     let finalChats = sortedChats.map((chat) => {

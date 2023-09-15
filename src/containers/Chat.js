@@ -80,7 +80,7 @@ const Chat = () => {
         >
           <Box style={{ display: "flex", alignItems: "center", height: "5%" }}>
             <Avatar sx={{ width: "2vw", height: "2vw", marginRight: "1vw" }}>
-              {activeChatName}
+              {activeChatName.charAt(0).toUpperCase()}
             </Avatar>
             <Box>
               <Box
@@ -159,6 +159,11 @@ const Chat = () => {
                     padding: "0.4vw 0 0.4vw 1vw",
                     marginRight: "0.7vw",
                   },
+                }}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter") {
+                    handleSendMessage();
+                  }
                 }}
               />
               <IconButton

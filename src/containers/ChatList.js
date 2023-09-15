@@ -50,15 +50,8 @@ const ChatList = ({ selectChat }) => {
       .catch((error) => console.log(error));
   };
 
-  const getUnreadCount = (chat) => {
-    let totalCount = chat.pings.length;
-    let userReadCount = chat.read.find(
-      (user) => user.participantId === sessionStorage.getItem("chattyUserId")
-    )?.readNotificationCount;
-    if (!userReadCount) {
-      return totalCount;
-    }
-    return totalCount - userReadCount;
+  const getNewCount = () => {
+    return chats.filter((chat) => chat.unreadCount > 0).length;
   };
 
   useEffect(() => {
@@ -174,22 +167,24 @@ const ChatList = ({ selectChat }) => {
               <Box style={{ color: "#fff", fontSize: fonts.font_20 }}>
                 Inbox
               </Box>
-              <Box
-                style={{
-                  backgroundColor: "#e31748ff",
-                  color: "#fff",
-                  borderRadius: "0.4vw",
-                  boxSizing: "border-box",
-                  fontSize: fonts.font_14,
-                  display: "flex",
-                  alignItems: "center",
-                  height: "1.1vw",
-                  width: "2.6vw",
-                  justifyContent: "center",
-                }}
-              >
-                2 new
-              </Box>
+              {getNewCount() > 0 && (
+                <Box
+                  style={{
+                    backgroundColor: "#e31748ff",
+                    color: "#fff",
+                    borderRadius: "0.4vw",
+                    boxSizing: "border-box",
+                    fontSize: fonts.font_14,
+                    display: "flex",
+                    alignItems: "center",
+                    height: "1.1vw",
+                    width: "2.6vw",
+                    justifyContent: "center",
+                  }}
+                >
+                  {`${getNewCount()} new`}
+                </Box>
+              )}
             </Box>
             <Box style={{ color: "#2f80edff", fontSize: fonts.font_20 }}>
               <Search sx={{ width: "1.4vw", height: "1.4vw" }} />
@@ -287,8 +282,9 @@ const ChatList = ({ selectChat }) => {
                     <Box
                       style={{
                         display: "flex",
-                        width: "60%",
+                        width: "55%",
                         flexDirection: "column",
+                        marginLeft: "1vw",
                       }}
                     >
                       <Box
