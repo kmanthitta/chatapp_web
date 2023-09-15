@@ -14,6 +14,7 @@ const ChatList = ({ selectChat }) => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [tab, setTab] = useState(0);
 
   const debouncedValue = useDebounce(searchQuery, 700);
 
@@ -193,7 +194,7 @@ const ChatList = ({ selectChat }) => {
           <Box
             style={{
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "space-around",
               backgroundColor: "#282b34ff",
               padding: "0.35vw 0.45vw",
               boxSizing: "border-box",
@@ -204,12 +205,16 @@ const ChatList = ({ selectChat }) => {
               style={{
                 display: "flex",
                 alignItems: "center",
-                backgroundColor: "#3b3e46ff",
+                backgroundColor: tab === 0 && "#3b3e46ff",
                 color: "#2f80edff",
-                padding: "0.1vw 0.7vw",
+                padding: "0.2vw 0.7vw",
                 borderRadius: "0.4vw",
                 fontSize: fonts.font_16,
+                width: "35%",
+                justifyContent: "center",
+                cursor: "pointer",
               }}
+              onClick={() => setTab(0)}
             >
               Primary
             </Box>
@@ -217,27 +222,18 @@ const ChatList = ({ selectChat }) => {
               style={{
                 display: "flex",
                 alignItems: "center",
-                backgroundColor: "#3b3e46ff",
+                backgroundColor: tab === 1 && "#3b3e46ff",
                 color: "#2f80edff",
-                padding: "0.1vw 0.7vw",
+                padding: "0.2vw 0.7vw",
                 borderRadius: "0.4vw",
                 fontSize: fonts.font_16,
+                width: "35%",
+                justifyContent: "center",
+                cursor: "pointer",
               }}
+              onClick={() => setTab(1)}
             >
               Groups
-            </Box>
-            <Box
-              style={{
-                display: "flex",
-                alignItems: "center",
-                backgroundColor: "#3b3e46ff",
-                color: "#2f80edff",
-                padding: "0.1vw 0.7vw",
-                borderRadius: "0.4vw",
-                fontSize: fonts.font_16,
-              }}
-            >
-              Archive
             </Box>
           </Box>
           <Box
