@@ -28,15 +28,6 @@ const Home = () => {
     socket.current = io("http://localhost:8080");
   }, []);
 
-  useEffect(() => {
-    socket.current.on("ping", (chat) => {
-      if (chat._id === selectedChat._id) {
-        dispatch(setSelectedChat({ selectedChat: chat }));
-      }
-      getChatList();
-    });
-  }, [selectedChat]);
-
   const getUnreadCount = (chat) => {
     let totalCount = chat.pings.length;
     let userReadCount = chat.read.find(
@@ -82,6 +73,26 @@ const Home = () => {
       })
       .catch((error) => console.log(error));
   };
+
+  useEffect(() => {
+    socket.current.on("ping", (chat) => {
+      if (selectedChat._id)
+        if (chat.chatId === selectedChat._id) {
+          let selChat = Object.assign({}, selectedChat);
+          selChat.pings = [...selChat.pings, chat.ping];
+          selChat.latestPing = chat.ping;
+          let allChats = [...chats];
+          sortChats(
+            allChats.map((chat) =>
+              chat._id === selectedChat._id ? selChat : chat
+            )
+          );
+          dispatch(setSelectedChat({ selectedChat: selChat }));
+        } else {
+          getChatList();
+        }
+    });
+  }, [selectedChat]);
 
   const getActiveChatName = (chat) => {
     return chat.name === ""
