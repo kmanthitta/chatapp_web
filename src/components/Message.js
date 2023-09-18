@@ -1,7 +1,7 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { fonts, getTimestamp } from "../common/utils";
 
-const Message = ({ content, type, timestamp }) => {
+const Message = ({ content, type, timestamp, authorName }) => {
   return (
     <Box
       style={{
@@ -30,7 +30,14 @@ const Message = ({ content, type, timestamp }) => {
               type === "sender" ? "0.9vw 0 0.9vw 0.9vw" : "0 0.9vw 0.9vw 0.9vw",
           }}
         >
-          {content}
+          <Box display="flex" flexDirection="column">
+            {type === "receiver" && (
+              <Typography
+                style={{ fontSize: fonts.font_16, color: "#2f80edff", marginBottom:'0.2vw' }}
+              >{`~${authorName}`}</Typography>
+            )}
+            {content}
+          </Box>
         </Box>
         <Box
           style={{

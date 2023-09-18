@@ -131,6 +131,7 @@ const Chat = () => {
                       : "receiver"
                   }
                   timestamp={ping.createdAt}
+                  authorName={ping.authorName}
                 />
               ))}
             </Box>

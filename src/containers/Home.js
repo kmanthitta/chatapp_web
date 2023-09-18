@@ -43,6 +43,12 @@ const Home = () => {
     return totalCount - userReadCount;
   };
 
+  const findAuthorName = (participantsList, authorId) => {
+    return participantsList.filter(
+      (participant) => participant._id === authorId
+    )[0].name;
+  };
+
   const sortChats = (chats) => {
     let sortedChats = chats.sort(function (a, b) {
       if (a.latestPing && b.latestPing) {
@@ -57,6 +63,20 @@ const Home = () => {
     let finalChats = sortedChats.map((chat) => {
       return { ...chat, unreadCount: getUnreadCount(chat) };
     });
+
+    console.log(finalChats);
+
+    finalChats = finalChats.map((chat) => {
+      if (chat.type === "group") {
+        chat.pings.forEach((ping) => {
+          !ping.authorName &&
+            (ping.authorName = findAuthorName(chat.participants, ping.author));
+        });
+        return chat;
+      }
+    });
+
+    console.log(finalChats);
 
     dispatch(setChats({ chats: finalChats }));
   };
@@ -76,10 +96,16 @@ const Home = () => {
 
   useEffect(() => {
     socket.current.on("ping", (chat) => {
+      console.log(chat);
       if (selectedChat._id)
         if (chat.chatId === selectedChat._id) {
           let selChat = Object.assign({}, selectedChat);
-          selChat.pings = [...selChat.pings, chat.ping];
+          let newPing = Object.assign({}, chat.ping);
+          newPing.authorName = findAuthorName(
+            selChat.participants,
+            chat.ping.author
+          );
+          selChat.pings = [...selChat.pings, newPing];
           selChat.latestPing = chat.ping;
           let allChats = [...chats];
           sortChats(
