@@ -34,7 +34,6 @@ const Home = () => {
       (user) => user.participantId === sessionStorage.getItem("chattyUserId")
     )?.readNotificationCount;
     if (chat._id === selectedChat._id) {
-      readChat(chat._id, totalCount);
       return 0;
     }
     if (!userReadCount) {
@@ -51,12 +50,14 @@ const Home = () => {
 
   const sortChats = (chats) => {
     let sortedChats = chats.sort(function (a, b) {
-      if (a.latestPing && b.latestPing) {
-        return (
-          new Date(b.latestPing.createdAt) - new Date(a.latestPing.createdAt)
-        );
-      } else {
-        return 0;
+      if (a.latestPing) {
+        if (b.latestPing) {
+          return (
+            new Date(b.latestPing.createdAt) - new Date(a.latestPing.createdAt)
+          );
+        } else {
+          return new Date(b.createdAt) - new Date(a.latestPing.createdAt);
+        }
       }
     });
 
@@ -64,19 +65,19 @@ const Home = () => {
       return { ...chat, unreadCount: getUnreadCount(chat) };
     });
 
-    console.log(finalChats);
-
     finalChats = finalChats.map((chat) => {
       if (chat.type === "group") {
         chat.pings.forEach((ping) => {
           !ping.authorName &&
             (ping.authorName = findAuthorName(chat.participants, ping.author));
+          chat.latestPing.authorName = findAuthorName(
+            chat.participants,
+            chat.latestPing.author
+          );
         });
-        return chat;
       }
+      return chat;
     });
-
-    console.log(finalChats);
 
     dispatch(setChats({ chats: finalChats }));
   };
@@ -96,29 +97,24 @@ const Home = () => {
 
   useEffect(() => {
     socket.current.on("ping", (chat) => {
-      console.log(chat);
-      if (selectedChat._id)
+      console.log("socket");
+      if (selectedChat._id) {
         if (chat.chatId === selectedChat._id) {
-          let selChat = Object.assign({}, selectedChat);
-          let newPing = Object.assign({}, chat.ping);
-          newPing.authorName = findAuthorName(
-            selChat.participants,
-            chat.ping.author
+          dispatch(
+            setSelectedChat({
+              selectedChat: {
+                ...selectedChat,
+                pings: [...selectedChat.pings, chat.ping],
+                latestPing: chat.ping,
+              },
+            })
           );
-          selChat.pings = [...selChat.pings, newPing];
-          selChat.latestPing = chat.ping;
-          let allChats = [...chats];
-          sortChats(
-            allChats.map((chat) =>
-              chat._id === selectedChat._id ? selChat : chat
-            )
-          );
-          dispatch(setSelectedChat({ selectedChat: selChat }));
-        } else {
-          getChatList();
         }
+      } else {
+        getChatList();
+      }
     });
-  }, [selectedChat]);
+  });
 
   const getActiveChatName = (chat) => {
     return chat.name === ""
@@ -130,7 +126,6 @@ const Home = () => {
 
   const selectChat = (chat) => {
     dispatch(setActiveChatName({ name: getActiveChatName(chat) }));
-    readChat(chat._id, chat.pings.length);
 
     let chatList = chats;
     let final = chatList.map((item) => {

@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { fonts, getTimestamp } from "../common/utils";
 
-const Message = ({ content, type, timestamp, authorName }) => {
+const Message = ({ content, type, timestamp, authorName, chat }) => {
   return (
     <Box
       style={{
@@ -31,10 +31,14 @@ const Message = ({ content, type, timestamp, authorName }) => {
           }}
         >
           <Box display="flex" flexDirection="column">
-            {type === "receiver" && (
+            {type === "receiver" && chat === "group" && (
               <Typography
-                style={{ fontSize: fonts.font_16, color: "#2f80edff", marginBottom:'0.2vw' }}
-              >{`~${authorName}`}</Typography>
+                style={{
+                  fontSize: fonts.font_16,
+                  color: "#2f80edff",
+                  marginBottom: "0.2vw",
+                }}
+              >{`~ ${authorName}`}</Typography>
             )}
             {content}
           </Box>

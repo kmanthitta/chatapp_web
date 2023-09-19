@@ -15,7 +15,16 @@ const SeachResult = ({ name, email, id, onClick }) => {
       onClick={onClick}
     >
       <Box style={{ alignSelf: "center" }}>
-        <Avatar sx={{ width: "2vw", height: "2vw" }}>{name.charAt(0)}</Avatar>
+        <Avatar
+          sx={{
+            width: "2vw",
+            height: "2vw",
+            fontSize: fonts.font_24,
+            color: "#3b3e46ff",
+          }}
+        >
+          {name.charAt(0).toUpperCase()}
+        </Avatar>
       </Box>
       <Box
         style={{

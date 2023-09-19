@@ -12,6 +12,17 @@ const Chat = () => {
 
   const [message, setMessage] = useState("");
 
+  console.log(selectedChat);
+
+  const participantsList = () => {
+    return selectedChat.type === "group"
+      ? selectedChat.participants
+          .filter((part) => part._id !== sessionStorage.getItem("chattyUserId"))
+          .map((part) => part.name)
+          .join(",")
+      : "";
+  };
+
   const handleSendMessage = () => {
     if (message.length > 0) {
       axios
@@ -27,11 +38,9 @@ const Chat = () => {
   };
 
   const scrollToBottom = () => {
-    setTimeout(() => {
-      let chatWindow = document.getElementById("chatWindow");
-      chatWindow?.scroll({
-        top: chatWindow.scrollHeight,
-      });
+    let chatWindow = document.getElementById("chatWindow");
+    chatWindow?.scroll({
+      top: chatWindow.scrollHeight,
     });
   };
 
@@ -79,7 +88,15 @@ const Chat = () => {
           }}
         >
           <Box style={{ display: "flex", alignItems: "center", height: "5%" }}>
-            <Avatar sx={{ width: "2vw", height: "2vw", marginRight: "1vw" }}>
+            <Avatar
+              sx={{
+                width: "2vw",
+                height: "2vw",
+                marginRight: "1vw",
+                fontSize: fonts.font_24,
+                color: "#3b3e46ff",
+              }}
+            >
               {activeChatName.charAt(0).toUpperCase()}
             </Avatar>
             <Box>
@@ -99,7 +116,7 @@ const Chat = () => {
                   padding: "0.2vw 0",
                 }}
               >
-                status
+                {participantsList()}
               </Box>
             </Box>
           </Box>
@@ -132,6 +149,7 @@ const Chat = () => {
                   }
                   timestamp={ping.createdAt}
                   authorName={ping.authorName}
+                  chat={selectedChat.type}
                 />
               ))}
             </Box>
@@ -162,7 +180,7 @@ const Chat = () => {
                   },
                 }}
                 onKeyDown={(e) => {
-                  if (e.key == "Enter") {
+                  if (e.key === "Enter") {
                     handleSendMessage();
                   }
                 }}
