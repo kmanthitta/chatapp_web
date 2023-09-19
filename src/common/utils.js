@@ -17,6 +17,22 @@ export const getTimestamp = (timestamp) => {
   // return moment.utc(timestamp).local().format("HH:mm");
 };
 
+export const getDateMonth = (timestamp) => {
+  return new Date(timestamp).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+export const getActiveChatName = (chat) => {
+  return chat.name === ""
+    ? chat.participants.filter(
+        (part) => part._id !== sessionStorage.getItem("chattyUserId")
+      )[0].name
+    : chat.name;
+};
+
 export const readChat = (chatId, count) => {
   axios.post(
     `http://localhost:8080/chat/read?userId=${sessionStorage.getItem(

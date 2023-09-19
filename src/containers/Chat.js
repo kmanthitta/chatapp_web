@@ -1,18 +1,17 @@
 import { Avatar, Box, IconButton, TextField, Typography } from "@mui/material";
 import { Send } from "@mui/icons-material";
 import Message from "../components/Message";
-import { fonts } from "../common/utils";
+import { fonts, getDateMonth } from "../common/utils";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import DateChip from "../components/DateChip";
 
 const Chat = () => {
   const selectedChat = useSelector((state) => state.chats.selectedChat);
   const activeChatName = useSelector((state) => state.chats.activeChatName);
 
   const [message, setMessage] = useState("");
-
-  console.log(selectedChat);
 
   const participantsList = () => {
     return selectedChat.type === "group"
@@ -139,18 +138,30 @@ const Chat = () => {
               }}
               id="chatWindow"
             >
-              {selectedChat.pings.map((ping) => (
-                <Message
-                  content={ping.message}
-                  type={
-                    ping.author === sessionStorage.getItem("chattyUserId")
-                      ? "sender"
-                      : "receiver"
-                  }
-                  timestamp={ping.createdAt}
-                  authorName={ping.authorName}
-                  chat={selectedChat.type}
-                />
+              {selectedChat.pings.map((ping, index) => (
+                <>
+                  {index === 0 && <DateChip date={ping.createdAt} />}
+                  <Message
+                    content={ping.message}
+                    type={
+                      ping.author === sessionStorage.getItem("chattyUserId")
+                        ? "sender"
+                        : "receiver"
+                    }
+                    timestamp={ping.createdAt}
+                    authorName={ping.authorName}
+                    chat={selectedChat.type}
+                  />
+                  {index !== selectedChat.pings.length - 1 &&
+                    new Date(ping?.createdAt).getDate() !==
+                      new Date(
+                        selectedChat.pings[index + 1].createdAt
+                      ).getDate() && (
+                      <DateChip
+                        date={selectedChat.pings[index + 1].createdAt}
+                      />
+                    )}
+                </>
               ))}
             </Box>
             <Box

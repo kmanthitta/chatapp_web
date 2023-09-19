@@ -7,7 +7,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveChatName, setChats, setSelectedChat } from "../store/chat";
 import { io } from "socket.io-client";
-import { readChat } from "../common/utils";
+import { getActiveChatName, readChat } from "../common/utils";
 
 const Home = () => {
   const chats = useSelector((state) => state.chats.chats);
@@ -97,7 +97,6 @@ const Home = () => {
 
   useEffect(() => {
     socket.current.on("ping", (chat) => {
-      console.log("socket");
       if (selectedChat._id) {
         if (chat.chatId === selectedChat._id) {
           dispatch(
@@ -115,14 +114,6 @@ const Home = () => {
       }
     });
   });
-
-  const getActiveChatName = (chat) => {
-    return chat.name === ""
-      ? chat.participants.filter(
-          (part) => part._id !== sessionStorage.getItem("chattyUserId")
-        )[0].name
-      : chat.name;
-  };
 
   const selectChat = (chat) => {
     dispatch(setActiveChatName({ name: getActiveChatName(chat) }));

@@ -3,11 +3,11 @@ import { Box, IconButton, TextField } from "@mui/material";
 import { useDebounce } from "../common/useDebounce";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import { fonts } from "../common/utils";
+import { fonts, getActiveChatName } from "../common/utils";
 import SeachResult from "../components/SearchResult";
 import CustomDialog from "../components/CustomDialog";
 import { useDispatch } from "react-redux";
-import { setSelectedChat } from "../store/chat";
+import { setActiveChatName, setSelectedChat } from "../store/chat";
 
 const SearchSection = ({ resetSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,6 +30,7 @@ const SearchSection = ({ resetSearch }) => {
         )}&withUserId=${id}`
       )
       .then((res) => {
+        dispatch(setActiveChatName({ name: getActiveChatName(res.data) }));
         dispatch(setSelectedChat({ selectedChat: res.data }));
         setSearchQuery("");
         resetSearch();

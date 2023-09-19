@@ -9,8 +9,6 @@ const ChatList = ({ selectChat }) => {
   const chats = useSelector((state) => state.chats.chats);
   const selectedChat = useSelector((state) => state.chats.selectedChat);
 
-  console.log(chats);
-
   const [showSearch, setShowSearch] = useState(false);
   const [tab, setTab] = useState(0);
 
